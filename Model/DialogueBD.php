@@ -36,10 +36,10 @@ class DialogueBD
         }
     }
 
-    public function getProducts(){
+    public function getCategories() {
         try {
             $conn = Connexion::getConnexion();
-            $sql = "SELECT * FROM products";
+            $sql = "SELECT * FROM categories";
             $sth = $conn->prepare($sql);
             $sth->execute();
             $cat = $sth->fetchAll(PDO::FETCH_ASSOC);
@@ -50,4 +50,36 @@ class DialogueBD
             //echo $erreur;
         }
     }
+
+    public function getProducts(){
+        try {
+            $conn = Connexion::getConnexion();
+            $sql = "SELECT * FROM products";
+            $sth = $conn->prepare($sql);
+            $sth->execute();
+            $produits = $sth->fetchAll(PDO::FETCH_ASSOC);
+            //var_dump($cat);
+            return $produits;
+        } catch (PDOException $e) {
+            $erreur = $e->getMessage();
+            //echo $erreur;
+        }
+    }
+
+    public function getProductsCat($id){
+        try {
+            $conn = Connexion::getConnexion();
+            $sql = "SELECT * FROM products where cat_id = ?";
+            $sth = $conn->prepare($sql);
+            $sth->execute(array($id));
+            $produits = $sth->fetchAll(PDO::FETCH_ASSOC);
+            //var_dump($cat);
+            return $produits;
+        } catch (PDOException $e) {
+            $erreur = $e->getMessage();
+            //echo $erreur;
+        }
+    }
+
+
 }
