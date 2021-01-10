@@ -51,6 +51,21 @@ class DialogueBD
         }
     }
 
+    public function getNomCat($id) {
+        try {
+            $conn = Connexion::getConnexion();
+            $sql = "SELECT name FROM categories WHERE id = ?";
+            $sth = $conn->prepare($sql);
+            $sth->execute(array($id));
+            $name = $sth->fetchAll(PDO::FETCH_ASSOC);
+            //var_dump($name);
+            return $name;
+        } catch (PDOException $e) {
+            $erreur = $e->getMessage();
+            //echo $erreur;
+        }
+    }
+
     public function getProducts(){
         try {
             $conn = Connexion::getConnexion();
