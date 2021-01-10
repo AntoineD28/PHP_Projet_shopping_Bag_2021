@@ -46,6 +46,7 @@ function categorie($id) {
                 $undlg = new DialogueBD();
                 $categories = $undlg->getCategories();
                 $products = $undlg->getProductsCat($id);
+                $name = $undlg->getNomCat($id);
                 require_once './View/listeProductCategView.php';
             } catch (Exception $e) {
                 $erreur = $e->getMessage();
