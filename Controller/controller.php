@@ -26,7 +26,7 @@ function listCateg() {
         }
 }
 
-function acceuil() {
+function TousProduits() {
         // Récupération des catégories et des produits
         try {
             // on crée un objet référant la classe DialogueBD
@@ -51,6 +51,18 @@ function categorie($id) {
             } catch (Exception $e) {
                 $erreur = $e->getMessage();
             }
+}
+
+function accueil() {
+        // Récupération des catégories
+        try {
+            // on crée un objet référant la classe DialogueBD
+            $undlg = new DialogueBD();
+            $categories = $undlg->getCategories();
+            require_once './View/listeCategView.php';
+        } catch (Exception $e) {
+            $erreur = $e->getMessage();
+        }
 }
 
 ?>
