@@ -23,8 +23,11 @@
                     </ul>
                 </li>
             </ul>
-            <a class="btn btn-warning me-2" href="#" role="button"><i class="fas fa-user"></i> Connexion</a>
-
+            <?php
+                if (isset($_SESSION['NAME']))
+                echo '<a class="btn btn-warning me-2" href="#" role="button"><i class="fas fa-user"></i> '. $_SESSION['NAME'] .'</a>';
+                else echo ' <a class="btn btn-warning me-2" href="View/connexionView.php" role="button"><i class="fas fa-user"></i> Connexion</a>';
+             ?>
             <a class="btn btn-dark text-warning" href="#" role="button"><i class="fas fa-shopping-cart"></i> Mon Panier</a>
         </div>
     </div>
@@ -32,8 +35,7 @@
 
 <div class="text-center">
     <?php
-    echo "<h1> Nos ". $name[0]['name'] ."</h1>";
-    echo $_SESSION['test'];    
+    echo "<h1> Nos ". $name[0]['name'] ."</h1>";  
     ?>
 </div>
 
