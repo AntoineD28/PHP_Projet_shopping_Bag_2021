@@ -20,13 +20,12 @@ class DialogueBD
     {
         try {
             $conn = Connexion::getConnexion();
-            $sql = "SELECT PrenomUtil, NomUtil ";
-            $sql = $sql . "FROM utilis ";
-            $sql = $sql . "WHERE LoginUtil = ? AND PassUtil = ?";
+            $sql = "SELECT customer_id, username ";
+            $sql = $sql . "FROM logins ";
+            $sql = $sql . "WHERE username = ? AND password = ?";
             $sth = $conn->prepare($sql);
             // Exécution de la requête en lui passant le tableau des arguments
-            $sth->execute(array($login, $mdp));
-            //$sth->execute();
+            $sth->execute(array($login, sha1($mdp)));
             $utilis = $sth->fetchAll(PDO::FETCH_ASSOC);
             //var_dump($utilis);
             return $utilis;
@@ -34,6 +33,44 @@ class DialogueBD
             $erreur = $e->getMessage();
             //echo $erreur;
         }
+    }
+    
+    public function createCustomers($forname, $surname, $add1, $add2, $add3, $postcode, $phone, $email, $registered = 1) {
+        $ajoutOK = false;
+        try {
+            // Insertion du nouveau customer
+            $conn = Connexion::getConnexion();
+            $sql = "INSERT INTO customers (`id`, `forname`, `surname`, `add1`, `add2`, `add3`, `postcode`, `phone`, `email`, `registered`) VALUES ";
+            $sql = "(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($forname, $surname, $add1, $add2, $add3, $postcode, $phone, $email, $registered));
+            // Variable drapeau indiquant le succès de l'ajout
+            $ajoutOK = true;
+        } catch (PDOException $e) {
+            $msgErreur = $e->getMessage() . '(' . $e->getFile() . ', ligne ' . $e->getLine() . ')';
+            //echo $erreur;
+        }
+        return $ajoutOK;
+    }
+
+    public function createLogins($customer_id, $username, $password) {
+        $ajoutOK = false;
+        try {
+            // Insertion des logs du customer
+            $conn = Connexion::getConnexion();
+            $sql = "INSERT INTO logins (`id`, `customer_id`, `username`, `password`) VALUES ";
+            $sql = "(NULL, ?, ?, ?)";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($customer_id, $username, $password));
+            // Variable drapeau indiquant le succès de l'ajout
+            $ajoutOK = true;
+        } catch (PDOException $e) {
+            $msgErreur = $e->getMessage() . '(' . $e->getFile() . ', ligne ' . $e->getLine() . ')';
+            //echo $erreur;
+        }
+        return $ajoutOK;
     }
 
     public function getCategories() {
