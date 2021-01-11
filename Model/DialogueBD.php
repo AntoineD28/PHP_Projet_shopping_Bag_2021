@@ -35,23 +35,39 @@ class DialogueBD
         }
     }
     
-    public function createCustomers($forname, $surname, $add1, $add2, $add3, $postcode, $phone, $email, $registered = 1) {
+    public function createCustomers($forname, $surname, $add1, $add2, $add3, $postcode, $phone, $email) {
         $ajoutOK = false;
         try {
             // Insertion du nouveau customer
             $conn = Connexion::getConnexion();
-            $sql = "INSERT INTO customers (`id`, `forname`, `surname`, `add1`, `add2`, `add3`, `postcode`, `phone`, `email`, `registered`) VALUES ";
-            $sql = "(NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO customers (`id`, `forname`, `surname`, `add1`, `add2`, `add3`, `postcode`, `phone`, `email`, `registered`) VALUES 
+                (NULL, ?, ?, ?, ?, ?, ?, ?, ?, 1)";
             $sth = $conn->prepare($sql);
             // Exécution de la requête en lui passant le tableau des arguments
-            $sth->execute(array($forname, $surname, $add1, $add2, $add3, $postcode, $phone, $email, $registered));
+            $sth->execute(array($forname, $surname, $add1, $add2, $add3, $postcode, $phone, $email));
             // Variable drapeau indiquant le succès de l'ajout
             $ajoutOK = true;
         } catch (PDOException $e) {
             $msgErreur = $e->getMessage() . '(' . $e->getFile() . ', ligne ' . $e->getLine() . ')';
-            //echo $erreur;
+            echo $msgErreur;
         }
         return $ajoutOK;
+    }
+
+    public function getLastID() {
+        try {
+            $conn = Connexion::getConnexion();
+            $sql = "SELECT MAX(id) FROM customers";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute();
+            $utilis = $sth->fetchAll(PDO::FETCH_ASSOC);
+            var_dump($utilis);
+            return $utilis;
+        } catch (PDOException $e) {
+            $erreur = $e->getMessage();
+            //echo $erreur;
+        }
     }
 
     public function createLogins($customer_id, $username, $password) {
@@ -59,11 +75,10 @@ class DialogueBD
         try {
             // Insertion des logs du customer
             $conn = Connexion::getConnexion();
-            $sql = "INSERT INTO logins (`id`, `customer_id`, `username`, `password`) VALUES ";
-            $sql = "(NULL, ?, ?, ?)";
+            $sql = "INSERT INTO logins (`id`, `customer_id`, `username`, `password`) VALUES (NULL, ?, ?, ?)";
             $sth = $conn->prepare($sql);
             // Exécution de la requête en lui passant le tableau des arguments
-            $sth->execute(array($customer_id, $username, $password));
+            $sth->execute(array($customer_id, $username, sha1($password)));
             // Variable drapeau indiquant le succès de l'ajout
             $ajoutOK = true;
         } catch (PDOException $e) {
