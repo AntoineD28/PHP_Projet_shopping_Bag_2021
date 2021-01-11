@@ -71,6 +71,23 @@ function accueil()
 
 function inscription()
 {
+        // Récupération des catégories
+        try {
+            // on crée un objet référant la classe DialogueBD
+            $undlg = new DialogueBD();
+            $create = $undlg->createCustomers($_POST['inputForname'],$_POST['inputSurname'],$_POST['inputAdd1'],$_POST['inputAdd2'],
+                $_POST['inputAdd3'],$_POST['inputPostCode'],$_POST['inputPhone'],$_POST['inputEmail']);
+            if ($create) {
+                $id = $undlg->getLastID();
+                $log = $undlg->createLogins($id[0]['MAX(id)'], $_POST['inputForname'], $_POST['inputPassword']);
+                if ($log) {
+                    $_SESSION['REG'] = true;
+                    require_once './View/connexionView.php';
+                }
+            }
+        } catch (Exception $e) {
+            $erreur = $e->getMessage();
+        }
 }
 
 function connexion()
