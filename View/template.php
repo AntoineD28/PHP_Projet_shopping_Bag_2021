@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="css/style.css" />
     <title><?= $title ?></title>
     <link href="./Bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="../Bootstrap/css/bootstrap.css" rel="stylesheet">
     <script src="https://kit.fontawesome.com/0c2bc87b87.js" crossorigin="anonymous"></script>
 </head>
 
