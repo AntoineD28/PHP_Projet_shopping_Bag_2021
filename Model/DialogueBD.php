@@ -34,8 +34,9 @@ class DialogueBD
             //echo $erreur;
         }
     }
-    
-    public function createCustomers($forname, $surname, $add1, $add2, $add3, $postcode, $phone, $email) {
+
+    public function createCustomers($forname, $surname, $add1, $add2, $add3, $postcode, $phone, $email)
+    {
         $ajoutOK = false;
         try {
             // Insertion du nouveau customer
@@ -54,7 +55,8 @@ class DialogueBD
         return $ajoutOK;
     }
 
-    public function getLastID() {
+    public function getLastID()
+    {
         try {
             $conn = Connexion::getConnexion();
             $sql = "SELECT MAX(id) FROM customers";
@@ -70,7 +72,8 @@ class DialogueBD
         }
     }
 
-    public function createLogins($customer_id, $username, $password) {
+    public function createLogins($customer_id, $username, $password)
+    {
         $ajoutOK = false;
         try {
             // Insertion des logs du customer
@@ -88,7 +91,8 @@ class DialogueBD
         return $ajoutOK;
     }
 
-    public function getCategories() {
+    public function getCategories()
+    {
         try {
             $conn = Connexion::getConnexion();
             $sql = "SELECT * FROM categories";
@@ -103,7 +107,8 @@ class DialogueBD
         }
     }
 
-    public function getNomCat($id) {
+    public function getNomCat($id)
+    {
         try {
             $conn = Connexion::getConnexion();
             $sql = "SELECT name FROM categories WHERE id = ?";
@@ -118,7 +123,8 @@ class DialogueBD
         }
     }
 
-    public function getProducts(){
+    public function getProducts()
+    {
         try {
             $conn = Connexion::getConnexion();
             $sql = "SELECT * FROM products";
@@ -133,7 +139,8 @@ class DialogueBD
         }
     }
 
-    public function getProductsCat($id){
+    public function getProductsCat($id)
+    {
         try {
             $conn = Connexion::getConnexion();
             $sql = "SELECT * FROM products where cat_id = ?";
@@ -148,5 +155,80 @@ class DialogueBD
         }
     }
 
+    public function AddOrderUnique($id)
+    {
+        $ajoutOK = false;
+        try {
+            // Insertion d'une nouvelle commande
+            $conn = Connexion::getConnexion();
+            $sql = "INSERT INTO `orders` (`id`, `customer_id`, `registered`, `delivery_add_id`, `payment_type`, `date`, `status`, `session`, `total`)
+                VALUES (NULL, '', 0, NULL, NULL, ?, 0, ? , NULL)";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($id, date("Y-m-d")));
+            // Variable drapeau indiquant le succès de l'ajout
+            $ajoutOK = true;
+        } catch (PDOException $e) {
+            $msgErreur = $e->getMessage() . '(' . $e->getFile() . ', ligne ' . $e->getLine() . ')';
+            //echo $msgErreur;
+        }
+        return $ajoutOK;
+    }
 
+    public function AddOrder($idUser, $session)
+    {
+        $ajoutOK = false;
+        try {
+            // Insertion d'une nouvelle commande
+            $conn = Connexion::getConnexion();
+            $sql = "INSERT INTO `orders` (`id`, `customer_id`, `registered`, `delivery_add_id`, `payment_type`, `date`, `status`, `session`, `total`)
+                VALUES (NULL, ?, 0, NULL, NULL, ?, 0, ? , NULL)";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($idUser, date("Y-m-d"), $session));
+            // Variable drapeau indiquant le succès de l'ajout
+            $ajoutOK = true;
+        } catch (PDOException $e) {
+            $msgErreur = $e->getMessage() . '(' . $e->getFile() . ', ligne ' . $e->getLine() . ')';
+            //echo $msgErreur;
+        }
+        return $ajoutOK;
+    }
+
+    public function getOrderId()
+    {
+        try {
+            $conn = Connexion::getConnexion();
+            $sql = "SELECT MAX(id) FROM orders";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute();
+            $utilis = $sth->fetchAll(PDO::FETCH_ASSOC);
+            var_dump($utilis);
+            return $utilis;
+        } catch (PDOException $e) {
+            $erreur = $e->getMessage();
+            //echo $erreur;
+        }
+    }
+
+    public function AddProduct($order_id, $product_id, $quantity) {
+        $ajoutOK = false;
+        $id = (int)$order_id; // On converti en int order_id
+        try {
+            // Insertion d'un nouveau produit dans le panier
+            $conn = Connexion::getConnexion();
+            $sql = "INSERT INTO `orderitems` (`id`, `order_id`, `product_id`, `quantity`) 
+                VALUES (NULL, ?, ?, ?)";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($id, $product_id, $quantity));
+            // Variable drapeau indiquant le succès de l'ajout
+            $ajoutOK = true;
+        } catch (PDOException $e) {
+            $msgErreur = $e->getMessage() . '(' . $e->getFile() . ', ligne ' . $e->getLine() . ')';
+            echo $msgErreur;
+        }
+        return $ajoutOK;
+    }
 }
