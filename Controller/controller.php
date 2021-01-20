@@ -69,25 +69,63 @@ function accueil()
     }
 }
 
+function AjoutPanier($idProduct)
+{
+    $idUnique = session_id();
+    // Ajout d'un produit au panier
+    try {
+        // on crée un objet référant la classe DialogueBD
+        $undlg = new DialogueBD();
+        $categories = $undlg->getCategories();
+        // Si il y déja une commande en cours 
+        if (isset($_SESSION['SESS_ORDERNUM'])) {
+            $order = $undlg->AddProduct($_SESSION['SESS_ORDERNUM'], $idProduct, $_POST['Quantity']);
+        } 
+        else { // Si il n'y pas de commande en cours
+            if (isset($_SESSION['ID'])) // Si l'utilisateur connecté n'a pas de commande en cours 
+                $orderOK = $undlg->AddOrder($_SESSION['ID'], $idUnique);
+            else $orderOK = $undlg->AddOrderUnique($idUnique); // Si l'utilisateur n'est pas connecté 
+            var_dump($orderOK);
+            if ($orderOK) {
+                $idOrder = $undlg-> getOrderId(); // Récupération de l'id de la commande créée juste avant 
+                $_SESSION['SESS_ORDERNUM'] = $idOrder[0]['MAX(id)'];
+                var_dump($_SESSION['SESS_ORDERNUM']);
+                $productOK = $undlg->AddProduct($_SESSION['SESS_ORDERNUM'], $idProduct, $_POST['Quantity']);
+            }
+        }
+        require_once './View/listeCategView.php';
+    } catch (Exception $e) {
+        $erreur = $e->getMessage();
+    }
+}
+
 function inscription()
 {
-        // Récupération des catégories
-        try {
-            // on crée un objet référant la classe DialogueBD
-            $undlg = new DialogueBD();
-            $create = $undlg->createCustomers($_POST['inputForname'],$_POST['inputSurname'],$_POST['inputAdd1'],$_POST['inputAdd2'],
-                $_POST['inputAdd3'],$_POST['inputPostCode'],$_POST['inputPhone'],$_POST['inputEmail']);
-            if ($create) {
-                $id = $undlg->getLastID();
-                $log = $undlg->createLogins($id[0]['MAX(id)'], $_POST['inputForname'], $_POST['inputPassword']);
-                if ($log) {
-                    $_SESSION['REG'] = true;
-                    require_once './View/connexionView.php';
-                }
+    // Récupération des catégories
+    try {
+        // on crée un objet référant la classe DialogueBD
+        $undlg = new DialogueBD();
+        $create = $undlg->createCustomers(
+            $_POST['inputForname'],
+            $_POST['inputSurname'],
+            $_POST['inputAdd1'],
+            $_POST['inputAdd2'],
+            $_POST['inputAdd3'],
+            $_POST['inputPostCode'],
+            $_POST['inputPhone'],
+            $_POST['inputEmail']
+        );
+        if ($create) {
+            $id = $undlg->getLastID();
+            $log = $undlg->createLogins($id[0]['MAX(id)'], $_POST['inputForname'], $_POST['inputPassword']);
+            if ($log) {
+                $_SESSION['REG'] = true;
+                require_once './View/connexionView.php';
             }
-        } catch (Exception $e) {
-            $erreur = $e->getMessage();
         }
+    } catch (Exception $e) {
+        $erreur = $e->getMessage();
+    }
 }
 
 function connexion()
@@ -98,7 +136,7 @@ function connexion()
         $undlg = new DialogueBD();
         $user = $undlg->getUtilisateur($_POST['login'], $_POST['mdp']);
         $categories = $undlg->getCategories();
-        foreach($user as $u){
+        foreach ($user as $u) {
             $id = $u['customer_id'];
             $username = $u['username'];
         }
@@ -106,8 +144,7 @@ function connexion()
             $_SESSION['ID'] = $id;
             $_SESSION['NAME'] = $username;
             require_once './View/listeCategView.php';
-        }
-        else {
+        } else {
             $_SESSION['authOK'] = false;
             require_once './View/connexionView.php';
         }
