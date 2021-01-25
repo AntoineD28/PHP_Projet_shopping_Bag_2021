@@ -72,28 +72,48 @@ function accueil()
 function AjoutPanier($idProduct)
 {
     $idUnique = session_id();
+    //var_dump($idUnique);
     // Ajout d'un produit au panier
     try {
         // on crée un objet référant la classe DialogueBD
         $undlg = new DialogueBD();
         $categories = $undlg->getCategories();
+        $price = $undlg->getPrix($idProduct); // On récupère le prix du produit 
         // Si il y déja une commande en cours 
         if (isset($_SESSION['SESS_ORDERNUM'])) {
             $order = $undlg->AddProduct($_SESSION['SESS_ORDERNUM'], $idProduct, $_POST['Quantity']);
-        } 
-        else { // Si il n'y pas de commande en cours
+            $prix = $_POST['Quantity'] * $price[0]['price'];
+            //var_dump($prix);
+            $updatePrice = $undlg->updateTotal($_SESSION['SESS_ORDERNUM'], $prix);
+            //var_dump($updatePrice);
+        } else { // Si il n'y pas de commande en cours
             if (isset($_SESSION['ID'])) // Si l'utilisateur connecté n'a pas de commande en cours 
                 $orderOK = $undlg->AddOrder($_SESSION['ID'], $idUnique);
             else $orderOK = $undlg->AddOrderUnique($idUnique); // Si l'utilisateur n'est pas connecté 
             var_dump($orderOK);
             if ($orderOK) {
-                $idOrder = $undlg-> getOrderId(); // Récupération de l'id de la commande créée juste avant 
+                $idOrder = $undlg->getOrderId(); // Récupération de l'id de la commande créée juste avant 
                 $_SESSION['SESS_ORDERNUM'] = $idOrder[0]['MAX(id)'];
                 var_dump($_SESSION['SESS_ORDERNUM']);
                 $productOK = $undlg->AddProduct($_SESSION['SESS_ORDERNUM'], $idProduct, $_POST['Quantity']);
+                $prix = $_POST['Quantity'] * $price[0]['price'];
+                $updatePrice = $undlg->updateTotal($_SESSION['SESS_ORDERNUM'], $prix);
             }
         }
         require_once './View/listeCategView.php';
+    } catch (Exception $e) {
+        $erreur = $e->getMessage();
+    }
+}
+
+function afficherPanier()
+{
+    try {
+        // on crée un objet référant la classe DialogueBD
+        $undlg = new DialogueBD();
+        $products = $undlg->getProductsOrder($_SESSION['SESS_ORDERNUM']);
+        //var_dump($products);
+        require_once './View/panierView.php';
     } catch (Exception $e) {
         $erreur = $e->getMessage();
     }
@@ -132,6 +152,8 @@ function connexion()
 {
     // Récupération de l'utilisateur
     try {
+        session_destroy();
+        session_start();
         // on crée un objet référant la classe DialogueBD
         $undlg = new DialogueBD();
         $user = $undlg->getUtilisateur($_POST['login'], $_POST['mdp']);
@@ -143,6 +165,8 @@ function connexion()
         if (isset($id) && isset($username)) {
             $_SESSION['ID'] = $id;
             $_SESSION['NAME'] = $username;
+            $order = $undlg->getOrder($_SESSION['ID']);
+            $_SESSION['SESS_ORDERNUM'] = $order[0]['id'];
             require_once './View/listeCategView.php';
         } else {
             $_SESSION['authOK'] = false;
