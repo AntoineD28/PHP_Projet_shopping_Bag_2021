@@ -50,30 +50,36 @@
 
 <div class="container">
     <?php
-    foreach ($products as $p) {
-        echo '<div class="row justify-content-md-center">
-                        <div class="card me-3 mt-3 ps-0" style="width: 40rem;">
-                            <div class="row g-0">
-                                <div class="col-md-4">
-                                    <img src="./productimages/' .  $p['image'] . '"class="card-img-top align-self-center" alt="...">
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">' . $p['name'] . '</h5>
-                                        <p class="card-text">' . $p['description'] . '</p>
-                                        <p class="card-text"><small class="text-muted">Quantité : ' . $p['quantity'] . '</small></p>
+    if (count($products) == 0) {
+        echo "<div class=\"text-center\">
+                <p> Vous n'avez pas d'article dans votre panier... </p>
+              </div>";
+    } else {
+        foreach ($products as $p) {
+            echo '<div class="row justify-content-md-center">
+                            <div class="card me-3 mt-3 ps-0" style="width: 40rem;">
+                                <div class="row g-0">
+                                    <div class="col-md-4">
+                                        <img src="./productimages/' .  $p['image'] . '"class="card-img-top align-self-center" alt="...">
                                     </div>
-                                    <div class="row justify-content-end align-items-end">
-                                    <a class="col-1 text-Danger" href="#"><i class="fas fa-times"></i></a>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <h5 class="card-title">' . $p['name'] . '</h5>
+                                            <p class="card-text">' . $p['description'] . '</p>
+                                            <p class="card-text"><small class="text-muted">Quantité : ' . $p['quantity'] . '</small></p>
+                                        </div>
+                                        <div class="row justify-content-end align-items-end">
+                                        <a class="col-1 text-Danger" href="index.php?action=retirerArticle&product_id=' . $p['product_id'] . '&price=' . $p['price'] . '&quantity=' . $p['quantity'] . '"><i class="fas fa-times"></i></a>
+                                    </div>
+                                    </div>
                                 </div>
-                                </div>
-                            </div>
-                        </div>';
+                            </div>';
+        }
+        echo '<div class="row justify-content-md-center">
+                <a class="btn btn-warning me-3 mt-3 ps-0" style="width: 40rem;" href="index.php?action=payement" role="button"><strong>Payer : '. $total[0]['total'] .' €</strong></a>
+            </div>';
     }
     ?>
-    <div class="row justify-content-md-center">
-        <a class="btn btn-warning me-3 mt-3 ps-0" style="width: 40rem;" href="" role="button">Payer</a>
-    </div>
 </div>
 </div>
 <?php
