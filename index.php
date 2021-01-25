@@ -1,6 +1,12 @@
 <?php
 require_once('./Controller/controller.php');
 session_start();
+$_SESSION['SESSION_ID'] = session_id();
+var_dump($_SESSION['ID']);
+var_dump($_SESSION['NAME']);
+var_dump($_SESSION['authOK']);
+var_dump($_SESSION['SESS_ORDERNUM']);
+var_dump($_SESSION['SESSION_ID']);
 
 //$param = explode('/', $_GET['action']);
 if (isset($_GET['action'])) {
