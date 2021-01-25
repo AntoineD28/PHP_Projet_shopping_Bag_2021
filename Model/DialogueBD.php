@@ -35,6 +35,25 @@ class DialogueBD
         }
     }
 
+
+    public function getAdresse($id)
+    {
+        try {
+            // Insertion du nouveau customer
+            $conn = Connexion::getConnexion();
+            $sql = "SELECT * FROM customers WHERE id = ?";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($id));
+            $coo = $sth->fetchAll(PDO::FETCH_ASSOC);
+            //var_dump($coo);
+            return $coo;
+        } catch (PDOException $e) {
+            $msgErreur = $e->getMessage();
+            echo $msgErreur;
+        }
+    }
+
     public function createCustomers($forname, $surname, $add1, $add2, $add3, $postcode, $phone, $email)
     {
         $ajoutOK = false;
@@ -229,6 +248,24 @@ class DialogueBD
         }
     }
 
+    public function getTotal($order_id)
+    {
+        $id = (int)$order_id; // On converti en int order_id
+        try {
+            $conn = Connexion::getConnexion();
+            $sql = "SELECT total FROM orders WHERE id = ?";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($id));
+            $order = $sth->fetchAll(PDO::FETCH_ASSOC);
+            var_dump($order);
+            return $order;
+        } catch (PDOException $e) {
+            $erreur = $e->getMessage();
+            echo $erreur;
+        }
+    }
+
     public function getOrder($customer_id)
     {
         $id = (int)$customer_id; // On converti en int order_id
@@ -275,6 +312,25 @@ class DialogueBD
             $sth = $conn->prepare($sql);
             // Exécution de la requête en lui passant le tableau des arguments
             $sth->execute(array($id, $product_id, $quantity));
+            // Variable drapeau indiquant le succès de l'ajout
+            $ajoutOK = true;
+        } catch (PDOException $e) {
+            $msgErreur = $e->getMessage() . '(' . $e->getFile() . ', ligne ' . $e->getLine() . ')';
+            echo $msgErreur;
+        }
+        return $ajoutOK;
+    }
+
+    public function removeProduct($order_id, $product_id) {
+        $ajoutOK = false;
+        $id = (int)$order_id; // On converti en int order_id
+        try {
+            // Insertion d'un nouveau produit dans le panier
+            $conn = Connexion::getConnexion();
+            $sql = "DELETE FROM orderitems WHERE order_id = ? AND product_id = ?";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($id, $product_id));
             // Variable drapeau indiquant le succès de l'ajout
             $ajoutOK = true;
         } catch (PDOException $e) {
