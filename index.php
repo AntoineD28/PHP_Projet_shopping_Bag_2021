@@ -10,11 +10,18 @@ var_dump($_SESSION['SESSION_ID']);
 
 //$param = explode('/', $_GET['action']);
 if (isset($_GET['action'])) {
+    // Choix d'un catégorie
     if (strlen($_GET['action']) == 1) {
         categorie($_GET['action']);
-    } else if (isset($_GET['id'])) {
+    } 
+    // ??
+    else if (isset($_GET['id'])) {
         $_GET['action']($_GET['id']);
-    } else {
+    } 
+    // Retire un article du panier
+    else if (isset($_GET['product_id']))
+        $_GET['action']($_GET['product_id'], $_GET['price'], $_GET['quantity']);
+    else {
         $_GET['action']();
     }
 } else {
