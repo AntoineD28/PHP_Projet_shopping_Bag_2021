@@ -111,9 +111,40 @@ function afficherPanier()
     try {
         // on crée un objet référant la classe DialogueBD
         $undlg = new DialogueBD();
+        $categories = $undlg->getCategories();
         $products = $undlg->getProductsOrder($_SESSION['SESS_ORDERNUM']);
+        $total = $undlg->getTotal($_SESSION['SESS_ORDERNUM']);
         //var_dump($products);
         require_once './View/panierView.php';
+    } catch (Exception $e) {
+        $erreur = $e->getMessage();
+    }
+}
+
+function retirerArticle($product_id, $price, $quantity)
+{
+    try {
+        // on crée un objet référant la classe DialogueBD
+        $undlg = new DialogueBD();
+        $categories = $undlg->getCategories();
+        $products = $undlg->removeProduct($_SESSION['SESS_ORDERNUM'], $product_id);
+        $prix = $price * $quantity;
+        $updatePrice = $undlg->updateTotal($_SESSION['SESS_ORDERNUM'], -$prix);
+        //var_dump($products);
+        afficherPanier();
+    } catch (Exception $e) {
+        $erreur = $e->getMessage();
+    }
+}
+
+function payement()
+{
+    try {
+        // on crée un objet référant la classe DialogueBD
+        $undlg = new DialogueBD();
+        $coordonnees = $undlg->getAdresse($_SESSION['ID']);
+        $products = $undlg->getProductsOrder($_SESSION['SESS_ORDERNUM']);
+        require_once './View/payementView.php';
     } catch (Exception $e) {
         $erreur = $e->getMessage();
     }
@@ -166,7 +197,8 @@ function connexion()
             $_SESSION['ID'] = $id;
             $_SESSION['NAME'] = $username;
             $order = $undlg->getOrder($_SESSION['ID']);
-            $_SESSION['SESS_ORDERNUM'] = $order[0]['id'];
+            if (count($order) != 0) // Si l'utilisateur à une commande en cours
+                $_SESSION['SESS_ORDERNUM'] = $order[0]['id'];
             require_once './View/listeCategView.php';
         } else {
             $_SESSION['authOK'] = false;
