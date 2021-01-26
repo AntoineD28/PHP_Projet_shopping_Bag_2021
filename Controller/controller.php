@@ -77,7 +77,7 @@ function AjoutPanier($idProduct)
     try {
         // on crée un objet référant la classe DialogueBD
         $undlg = new DialogueBD();
-        $categories = $undlg->getCategories();
+        //$categories = $undlg->getCategories();
         $price = $undlg->getPrix($idProduct); // On récupère le prix du produit 
         // Si il y déja une commande en cours 
         if (isset($_SESSION['SESS_ORDERNUM'])) {
@@ -100,7 +100,8 @@ function AjoutPanier($idProduct)
                 $updatePrice = $undlg->updateTotal($_SESSION['SESS_ORDERNUM'], $prix);
             }
         }
-        require_once './View/listeCategView.php';
+        $cat_id = $undlg->getCatId($idProduct);
+        categorie($cat_id[0]['cat_id']);
     } catch (Exception $e) {
         $erreur = $e->getMessage();
     }
@@ -112,8 +113,13 @@ function afficherPanier()
         // on crée un objet référant la classe DialogueBD
         $undlg = new DialogueBD();
         $categories = $undlg->getCategories();
-        $products = $undlg->getProductsOrder($_SESSION['SESS_ORDERNUM']);
-        $total = $undlg->getTotal($_SESSION['SESS_ORDERNUM']);
+        if (isset($_SESSION['SESS_ORDERNUM'])) {
+            $products = $undlg->getProductsOrder($_SESSION['SESS_ORDERNUM']);
+            $total = $undlg->getTotal($_SESSION['SESS_ORDERNUM']);
+            $connOK = true;
+        } else {
+            $connOK = false;
+        }
         //var_dump($products);
         require_once './View/panierView.php';
     } catch (Exception $e) {
@@ -142,12 +148,69 @@ function payement()
     try {
         // on crée un objet référant la classe DialogueBD
         $undlg = new DialogueBD();
-        $coordonnees = $undlg->getAdresse($_SESSION['ID']);
+        $categories = $undlg->getCategories();
+        if (isset($_SESSION['ID']))
+            $coordonnees = $undlg->getAdresse($_SESSION['ID']);
         $products = $undlg->getProductsOrder($_SESSION['SESS_ORDERNUM']);
+        $total = $undlg->getTotal($_SESSION['SESS_ORDERNUM']);
         require_once './View/payementView.php';
     } catch (Exception $e) {
         $erreur = $e->getMessage();
     }
+}
+
+function commandeOK()
+{
+    var_dump($_POST);
+    try {
+        // on crée un objet référant la classe DialogueBD
+        $undlg = new DialogueBD();
+        $categories = $undlg->getCategories();
+        if (isset($_SESSION['ID'])) {
+            if ($_POST['RadioAddSelec'] == 'Other') {
+                $ajoutAddOK = $undlg->addDeliveryAdresse(
+                    $_POST['prenom'],
+                    $_POST['nom'],
+                    $_POST['add1'],
+                    $_POST['add2'],
+                    $_POST['ville'],
+                    $_POST['postcode'],
+                    $_POST['phone'],
+                    $_POST['email']
+                );
+                $IDadd = $undlg->getLastDeliveryId();
+                $updateOk = $undlg->updateOrder($_SESSION['SESS_ORDERNUM'], $_POST['RadioPlaySelec'], $IDadd[0]['MAX(id)']);
+            } else {
+                // On utilise directement l'adresse que l'utilisateur a renseigné lors de son l'inscription d'où le '0'
+                $updateOk = $undlg->updateOrder($_SESSION['SESS_ORDERNUM'], $_POST['RadioPlaySelec'], 0); 
+            }
+        } else {
+            $ajoutAddOK = $undlg->addDeliveryAdresse(
+                $_POST['prenom'],
+                $_POST['nom'],
+                $_POST['add1'],
+                $_POST['add2'],
+                $_POST['ville'],
+                $_POST['postcode'],
+                $_POST['phone'],
+                $_POST['email']
+            );
+            $IDadd = $undlg->getLastDeliveryId();
+            //$adresse = $undlg->getDeliveryAdd($IDadd[0]['MAX(id)']);
+            $updateOk = $undlg->updateOrder($_SESSION['SESS_ORDERNUM'], $_POST['RadioPlaySelec'], $IDadd[0]['MAX(id)']);
+        }
+        require_once './View/recapOrderView.php';
+    } catch (Exception $e) {
+        $erreur = $e->getMessage();
+    }
+}
+
+function facturePDF($id)
+{
+    $undlg = new DialogueBD();
+    $order = $undlg->getProductsOrder($id);
+    $total = $undlg->getTotal($id);
+    require_once './View/factureView.php';
 }
 
 function inscription()
