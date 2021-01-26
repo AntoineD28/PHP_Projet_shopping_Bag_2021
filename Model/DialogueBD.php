@@ -210,6 +210,23 @@ class DialogueBD
         }
     }
 
+    public function getCatId($id)
+    {
+        try {
+            // Récupération du prix d'un article
+            $conn = Connexion::getConnexion();
+            $sql = "SELECT cat_id FROM products where id = ?";
+            $sth = $conn->prepare($sql);
+            $sth->execute(array($id));
+            $price = $sth->fetchAll(PDO::FETCH_ASSOC);
+            //var_dump($cat);
+            return $price;
+        } catch (PDOException $e) {
+            $erreur = $e->getMessage();
+            echo $erreur;
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
 
     //////////////////////// REQUÊTES SQL TABLE orders ////////////////////////////
@@ -265,7 +282,7 @@ class DialogueBD
             // Exécution de la requête en lui passant le tableau des arguments
             $sth->execute(array($id));
             $order = $sth->fetchAll(PDO::FETCH_ASSOC);
-            var_dump($order);
+            //var_dump($order);
             return $order;
         } catch (PDOException $e) {
             $erreur = $e->getMessage();
@@ -329,6 +346,26 @@ class DialogueBD
         return $updateOK;
     }
 
+    public function updateOrder($order_id, $payment, $id_delivery) {
+        $updateOK = false;
+        $id = (int)$order_id; // On converti en int order_id
+        $idAdd = (int)$id_delivery;
+        try {
+            // Maj du prix total de la commande
+            $conn = Connexion::getConnexion();
+            $sql = "UPDATE `orders` SET `status` = 2, payment_type = ?, delivery_add_id = ? WHERE id = ?";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($payment, $idAdd, $id));
+            // Variable drapeau indiquant le succès de l'ajout
+            $updateOK = true;
+        } catch (PDOException $e) {
+            $msgErreur = $e->getMessage() . '(' . $e->getFile() . ', ligne ' . $e->getLine() . ')';
+            echo $msgErreur;
+        }
+        return $updateOK;
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
 
     //////////////////////// REQUÊTES SQL TABLE orderitems ////////////////////////
@@ -344,7 +381,7 @@ class DialogueBD
             // Exécution de la requête en lui passant le tableau des arguments
             $sth->execute(array($id));
             $order = $sth->fetchAll(PDO::FETCH_ASSOC);
-            var_dump($order);
+            //var_dump($order);
             return $order;
         } catch (PDOException $e) {
             $erreur = $e->getMessage();
@@ -394,6 +431,61 @@ class DialogueBD
     ///////////////////////////////////////////////////////////////////////////////
 
     ///////////////// REQUÊTES SQL TABLE delivery_addresses ///////////////////////
+
+    public function addDeliveryAdresse($firstname, $lastname, $add1, $add2, $ville, $postcode, $phone, $email) {
+        $ajoutOK = false;
+        try {
+            // Insertion du nouveau customer
+            $conn = Connexion::getConnexion();
+            $sql = "INSERT INTO delivery_addresses (`id`, `firstname`, `lastname`, `add1`, `add2`, `city`, `postcode`, `phone`, `email`) VALUES 
+                (NULL, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($firstname, $lastname, $add1, $add2, $ville, $postcode, $phone, $email));
+            // Variable drapeau indiquant le succès de l'ajout
+            $ajoutOK = true;
+        } catch (PDOException $e) {
+            $msgErreur = $e->getMessage() . '(' . $e->getFile() . ', ligne ' . $e->getLine() . ')';
+            echo $msgErreur;
+        }
+        return $ajoutOK;
+    }
+
+    public function getLastDeliveryId()
+    {
+        try {
+            // Récupération de la dernière commande crée 
+            $conn = Connexion::getConnexion();
+            $sql = "SELECT MAX(id) FROM delivery_addresses";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute();
+            $utilis = $sth->fetchAll(PDO::FETCH_ASSOC);
+            var_dump($utilis);
+            return $utilis;
+        } catch (PDOException $e) {
+            $erreur = $e->getMessage();
+            echo $erreur;
+        }
+    }
+
+    public function getDeliveryAdd($id)
+    {
+        try {
+            // Récupération de la dernière commande crée 
+            $conn = Connexion::getConnexion();
+            $sql = "SELECT * FROM delivery_addresses WHERE id = ?";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($id));
+            $utilis = $sth->fetchAll(PDO::FETCH_ASSOC);
+            var_dump($utilis);
+            return $utilis;
+        } catch (PDOException $e) {
+            $erreur = $e->getMessage();
+            echo $erreur;
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////
 
