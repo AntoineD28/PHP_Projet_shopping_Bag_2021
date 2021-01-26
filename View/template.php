@@ -3,7 +3,6 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html" ; charset="utf-8" />
-    <link rel="stylesheet" href="css/style.css" />
     <title><?= $title ?></title>
     <link href="./Bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="../Bootstrap/css/bootstrap.css" rel="stylesheet">

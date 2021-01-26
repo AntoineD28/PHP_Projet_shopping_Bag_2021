@@ -50,7 +50,7 @@
 
 <div class="container">
     <?php
-    if (count($products) == 0) {
+    if (!$connOK || count($products) == 0)  {
         echo "<div class=\"text-center\">
                 <p> Vous n'avez pas d'article dans votre panier... </p>
               </div>";
@@ -69,14 +69,14 @@
                                             <p class="card-text"><small class="text-muted">Quantité : ' . $p['quantity'] . '</small></p>
                                         </div>
                                         <div class="row justify-content-end align-items-end">
-                                        <a class="col-1 text-Danger" href="index.php?action=retirerArticle&product_id=' . $p['product_id'] . '&price=' . $p['price'] . '&quantity=' . $p['quantity'] . '"><i class="fas fa-times"></i></a>
+                                        <a class="col-1 text-danger" href="index.php?action=retirerArticle&product_id=' . $p['product_id'] . '&price=' . $p['price'] . '&quantity=' . $p['quantity'] . '"><i class="fas fa-times"></i></a>
                                     </div>
                                     </div>
                                 </div>
                             </div>';
         }
         echo '<div class="row justify-content-md-center">
-                <a class="btn btn-warning me-3 mt-3 ps-0" style="width: 40rem;" href="index.php?action=payement" role="button"><strong>Payer : '. $total[0]['total'] .' €</strong></a>
+                <a class="btn btn-warning me-3 mt-3 mb-3 ps-0" style="width: 40rem;" href="index.php?action=payement" role="button"><strong>Payer : '. $total[0]['total'] .' €</strong></a>
             </div>';
     }
     ?>
