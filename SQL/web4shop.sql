@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.3
+-- version 4.8.0
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Jan 27, 2021 at 06:06 PM
--- Server version: 10.4.14-MariaDB
--- PHP Version: 7.2.34
+-- Hôte : 127.0.0.1
+-- Généré le :  mer. 27 jan. 2021 à 22:13
+-- Version du serveur :  10.1.31-MariaDB
+-- Version de PHP :  7.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -18,15 +19,15 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `web4shop`
+-- Base de données :  `web4shop`
 --
- CREATE DATABASE `web4shop`;
- USE `web4shop`;
- grant all privileges on web4shop.* to 'usersio'@'localhost' identified by 'sio';
+CREATE DATABASE `web4shop`;
+USE `web4shop`;
+grant all privileges on web4shop.* to 'usersio'@'localhost' identified by 'sio'; 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `admin`
+-- Structure de la table `admin`
 --
 
 CREATE TABLE `admin` (
@@ -36,7 +37,7 @@ CREATE TABLE `admin` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `admin`
+-- Déchargement des données de la table `admin`
 --
 
 INSERT INTO `admin` (`id`, `username`, `password`) VALUES
@@ -46,7 +47,7 @@ INSERT INTO `admin` (`id`, `username`, `password`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `categories`
+-- Structure de la table `categories`
 --
 
 CREATE TABLE `categories` (
@@ -56,7 +57,7 @@ CREATE TABLE `categories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `categories`
+-- Déchargement des données de la table `categories`
 --
 
 INSERT INTO `categories` (`id`, `name`, `image`) VALUES
@@ -67,7 +68,7 @@ INSERT INTO `categories` (`id`, `name`, `image`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `customers`
+-- Structure de la table `customers`
 --
 
 CREATE TABLE `customers` (
@@ -84,20 +85,20 @@ CREATE TABLE `customers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `customers`
+-- Déchargement des données de la table `customers`
 --
 
 INSERT INTO `customers` (`id`, `firstname`, `lastname`, `add1`, `add2`, `city`, `postcode`, `phone`, `email`, `registered`) VALUES
 (1, 'Sarah', 'Hamida', 'ligne add1', 'ligne add2', 'Meximieux', '01800', '0612345678', 's.hamida@gmail.com', 1),
 (2, 'Jean-Benoît', 'Delaroche', 'ligne add1', 'ligne add2', 'Lyon', '69009', '0796321458', 'jb.delaroche@gmx.fr', 1),
-(26, 'Antoine', 'DUMAS', '53 rue sully', '', '', '69150', '0611733095', 'antoine@gmail.com', 1),
-(27, 'Lény', 'Metzger', '3 rue chemin', '', '', '07000', '0635290685', 'Leny@gmail.com', 1),
+(26, 'Antoine', 'DUMAS', '25 passage Jacques Lacan', '', 'Valence', '26500', '0611856925', 'antoine@gmail.com', 1),
+(27, 'Lény', 'Metzger', '3 rue chemin', '', '', '07000', '0635295841', 'Leny@gmail.com', 1),
 (28, 'Dylam', 'dum', 'rue germain david', '', 'Lyon', '69000', '0611733095', 'dylan@gmail.com', 1);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `delivery_addresses`
+-- Structure de la table `delivery_addresses`
 --
 
 CREATE TABLE `delivery_addresses` (
@@ -113,7 +114,7 @@ CREATE TABLE `delivery_addresses` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `delivery_addresses`
+-- Déchargement des données de la table `delivery_addresses`
 --
 
 INSERT INTO `delivery_addresses` (`id`, `firstname`, `lastname`, `add1`, `add2`, `city`, `postcode`, `phone`, `email`) VALUES
@@ -123,12 +124,13 @@ INSERT INTO `delivery_addresses` (`id`, `firstname`, `lastname`, `add1`, `add2`,
 (49, 'Louise', 'Delaroche', '12 avenue condorcet', 'étage 2', 'Saint Priest', '45097', '0526117898', 'louise.delaroche@yahoo.fr'),
 (54, 'Eric', 'LeZin', '3 boulevard Marseille', 'étage 2', 'Chatte', '42000', '0676787689', 'Eric@gmail.com'),
 (55, 'Antoine', 'DUMAS', '53 rue Sully ', '', 'Décines', '69150', '0611733095', 'antoine@gmail.com'),
-(57, 'Antoine', 'DUMAS', '53 rue Sully', '', 'Décines', '69150', '0611733095', 'antoine@gmail.com');
+(57, 'Antoine', 'DUMAS', '53 rue Sully', '', 'Décines', '69150', '0611733095', 'antoine@gmail.com'),
+(58, 'Théo', 'Pierron', 'rue la joliette', '', 'Marseille', '13150', '0658781539', 'theo@gmail.com');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `logins`
+-- Structure de la table `logins`
 --
 
 CREATE TABLE `logins` (
@@ -139,7 +141,7 @@ CREATE TABLE `logins` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `logins`
+-- Déchargement des données de la table `logins`
 --
 
 INSERT INTO `logins` (`id`, `customer_id`, `username`, `password`) VALUES
@@ -152,7 +154,7 @@ INSERT INTO `logins` (`id`, `customer_id`, `username`, `password`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `orderitems`
+-- Structure de la table `orderitems`
 --
 
 CREATE TABLE `orderitems` (
@@ -163,7 +165,7 @@ CREATE TABLE `orderitems` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `orderitems`
+-- Déchargement des données de la table `orderitems`
 --
 
 INSERT INTO `orderitems` (`id`, `order_id`, `product_id`, `quantity`) VALUES
@@ -191,12 +193,18 @@ INSERT INTO `orderitems` (`id`, `order_id`, `product_id`, `quantity`) VALUES
 (319, 92, 8, 3),
 (322, 94, 13, 6),
 (325, 94, 4, 2),
-(326, 94, 28, 1);
+(326, 94, 28, 1),
+(330, 95, 5, 2),
+(338, 93, 5, 2),
+(339, 98, 4, 2),
+(340, 98, 24, 2),
+(341, 99, 13, 3),
+(343, 100, 5, 3);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `orders`
+-- Structure de la table `orders`
 --
 
 CREATE TABLE `orders` (
@@ -212,7 +220,7 @@ CREATE TABLE `orders` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `orders`
+-- Déchargement des données de la table `orders`
 --
 
 INSERT INTO `orders` (`id`, `customer_id`, `registered`, `delivery_add_id`, `payment_type`, `date`, `status`, `session`, `total`) VALUES
@@ -229,13 +237,19 @@ INSERT INTO `orders` (`id`, `customer_id`, `registered`, `delivery_add_id`, `pay
 (90, '27', 1, NULL, NULL, '2021-01-26', 0, '542949deef12152012bc9223eab71de0', '20.90'),
 (91, '', 0, NULL, NULL, '2021-01-27', 0, 'b1830292cfcb5ac427a4bb154715e88c', '-20.80'),
 (92, '', 0, 57, 'paypal', '2021-01-27', 2, 'b1830292cfcb5ac427a4bb154715e88c', '46.50'),
-(93, '26', 1, NULL, NULL, '2021-01-27', 0, 'b1830292cfcb5ac427a4bb154715e88c', '0.00'),
-(94, '28', 1, 0, 'paypal', '2021-01-27', 10, 'c96b3a5bb1d01582e8d610a2e9059c30', '82.30');
+(93, '26', 1, 0, 'cheque', '2021-01-27', 2, 'b1830292cfcb5ac427a4bb154715e88c', '21.00'),
+(94, '28', 1, 0, 'paypal', '2021-01-27', 10, 'c96b3a5bb1d01582e8d610a2e9059c30', '82.30'),
+(95, '', 0, NULL, NULL, '2021-01-27', 0, '8f51ovoqmqf4n5r06abcn1kdn5', '21.00'),
+(96, '', 0, NULL, NULL, '2021-01-27', 0, '8f51ovoqmqf4n5r06abcn1kdn5', '0.00'),
+(97, '', 0, NULL, NULL, '2021-01-27', 0, '8f51ovoqmqf4n5r06abcn1kdn5', '0.00'),
+(98, '', 0, 58, 'paypal', '2021-01-27', 2, '8f51ovoqmqf4n5r06abcn1kdn5', '66.80'),
+(99, '28', 1, 0, 'cheque', '2021-01-27', 2, '8f51ovoqmqf4n5r06abcn1kdn5', '15.60'),
+(100, '26', 1, 0, 'paypal', '2021-01-27', 2, '8f51ovoqmqf4n5r06abcn1kdn5', '31.50');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `products`
+-- Structure de la table `products`
 --
 
 CREATE TABLE `products` (
@@ -249,7 +263,7 @@ CREATE TABLE `products` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `products`
+-- Déchargement des données de la table `products`
 --
 
 INSERT INTO `products` (`id`, `cat_id`, `name`, `description`, `image`, `price`, `stock`) VALUES
@@ -282,7 +296,7 @@ INSERT INTO `products` (`id`, `cat_id`, `name`, `description`, `image`, `price`,
 -- --------------------------------------------------------
 
 --
--- Table structure for table `reviews`
+-- Structure de la table `reviews`
 --
 
 CREATE TABLE `reviews` (
@@ -295,7 +309,7 @@ CREATE TABLE `reviews` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Dumping data for table `reviews`
+-- Déchargement des données de la table `reviews`
 --
 
 INSERT INTO `reviews` (`id_product`, `name_user`, `photo_user`, `stars`, `title`, `description`) VALUES
@@ -341,121 +355,121 @@ INSERT INTO `reviews` (`id_product`, `name_user`, `photo_user`, `stars`, `title`
 (22, 'Sylvain', 'homme.jpg', 5, 'délicieux', 'une boisson très parfumée; idéale pour bien démarrer la journée; à essayer les yeux fermés.');
 
 --
--- Indexes for dumped tables
+-- Index pour les tables déchargées
 --
 
 --
--- Indexes for table `admin`
+-- Index pour la table `admin`
 --
 ALTER TABLE `admin`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `categories`
+-- Index pour la table `categories`
 --
 ALTER TABLE `categories`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `customers`
+-- Index pour la table `customers`
 --
 ALTER TABLE `customers`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `delivery_addresses`
+-- Index pour la table `delivery_addresses`
 --
 ALTER TABLE `delivery_addresses`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `logins`
+-- Index pour la table `logins`
 --
 ALTER TABLE `logins`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `orderitems`
+-- Index pour la table `orderitems`
 --
 ALTER TABLE `orderitems`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `orders`
+-- Index pour la table `orders`
 --
 ALTER TABLE `orders`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `products`
+-- Index pour la table `products`
 --
 ALTER TABLE `products`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `reviews`
+-- Index pour la table `reviews`
 --
 ALTER TABLE `reviews`
   ADD KEY `review/product` (`id_product`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT pour les tables déchargées
 --
 
 --
--- AUTO_INCREMENT for table `admin`
+-- AUTO_INCREMENT pour la table `admin`
 --
 ALTER TABLE `admin`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- AUTO_INCREMENT for table `categories`
+-- AUTO_INCREMENT pour la table `categories`
 --
 ALTER TABLE `categories`
   MODIFY `id` tinyint(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
--- AUTO_INCREMENT for table `customers`
+-- AUTO_INCREMENT pour la table `customers`
 --
 ALTER TABLE `customers`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
--- AUTO_INCREMENT for table `delivery_addresses`
+-- AUTO_INCREMENT pour la table `delivery_addresses`
 --
 ALTER TABLE `delivery_addresses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
--- AUTO_INCREMENT for table `logins`
+-- AUTO_INCREMENT pour la table `logins`
 --
 ALTER TABLE `logins`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
--- AUTO_INCREMENT for table `orderitems`
+-- AUTO_INCREMENT pour la table `orderitems`
 --
 ALTER TABLE `orderitems`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=327;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=344;
 
 --
--- AUTO_INCREMENT for table `orders`
+-- AUTO_INCREMENT pour la table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
+  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
 
 --
--- AUTO_INCREMENT for table `products`
+-- AUTO_INCREMENT pour la table `products`
 --
 ALTER TABLE `products`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
--- Constraints for dumped tables
+-- Contraintes pour les tables déchargées
 --
 
 --
--- Constraints for table `reviews`
+-- Contraintes pour la table `reviews`
 --
 ALTER TABLE `reviews`
   ADD CONSTRAINT `review/product` FOREIGN KEY (`id_product`) REFERENCES `products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
