@@ -14,6 +14,30 @@ require_once 'Connexion.php';
 
 class DialogueBD
 {
+
+    //////////////////////////////////////////////////////////////////////////
+
+    //////////////////////// REQUÊTE SQL TABLE admin ////////////////////////
+
+    public function getAdmin($login, $mdp)
+    {
+        try {
+            $conn = Connexion::getConnexion();
+            $sql = "SELECT id, username ";
+            $sql = $sql . "FROM admin ";
+            $sql = $sql . "WHERE username = ? AND password = ?";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($login, sha1($mdp)));
+            $utilis = $sth->fetchAll(PDO::FETCH_ASSOC);
+            //var_dump($utilis);
+            return $utilis;
+        } catch (PDOException $e) {
+            $erreur = $e->getMessage();
+            //echo $erreur;
+        }
+    }
+
     //////////////////////////////////////////////////////////////////////////
 
     //////////////////////// REQUÊTE SQL TABLE logins ////////////////////////
@@ -67,7 +91,7 @@ class DialogueBD
         try {
             // Insertion du nouveau customer
             $conn = Connexion::getConnexion();
-            $sql = "INSERT INTO customers (`id`, `forname`, `surname`, `add1`, `add2`, `add3`, `postcode`, `phone`, `email`, `registered`) VALUES 
+            $sql = "INSERT INTO customers (`id`, `firstname`, `lastname`, `add1`, `add2`, `city`, `postcode`, `phone`, `email`, `registered`) VALUES 
                 (NULL, ?, ?, ?, ?, ?, ?, ?, ?, 1)";
             $sth = $conn->prepare($sql);
             // Exécution de la requête en lui passant le tableau des arguments
@@ -109,7 +133,7 @@ class DialogueBD
             // Exécution de la requête en lui passant le tableau des arguments
             $sth->execute();
             $utilis = $sth->fetchAll(PDO::FETCH_ASSOC);
-            var_dump($utilis);
+            //var_dump($utilis);
             return $utilis;
         } catch (PDOException $e) {
             $erreur = $e->getMessage();
@@ -231,6 +255,24 @@ class DialogueBD
 
     //////////////////////// REQUÊTES SQL TABLE orders ////////////////////////////
 
+    public function getOrderPaye()
+    {
+        try {
+            // Récupération de la commande en cours d'un utilisateur connecté
+            $conn = Connexion::getConnexion();
+            $sql = "SELECT * FROM orders WHERE `status` = 2";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute();
+            $order = $sth->fetchAll(PDO::FETCH_ASSOC);
+            //var_dump($order);
+            return $order;
+        } catch (PDOException $e) {
+            $erreur = $e->getMessage();
+            echo $erreur;
+        }
+    }
+
     public function AddOrderUnique($id)
     {
         $ajoutOK = false;
@@ -301,7 +343,7 @@ class DialogueBD
             // Exécution de la requête en lui passant le tableau des arguments
             $sth->execute(array($id));
             $order = $sth->fetchAll(PDO::FETCH_ASSOC);
-            var_dump($order);
+            // var_dump($order);
             return $order;
         } catch (PDOException $e) {
             $erreur = $e->getMessage();
@@ -319,7 +361,7 @@ class DialogueBD
             // Exécution de la requête en lui passant le tableau des arguments
             $sth->execute();
             $utilis = $sth->fetchAll(PDO::FETCH_ASSOC);
-            var_dump($utilis);
+            //var_dump($utilis);
             return $utilis;
         } catch (PDOException $e) {
             $erreur = $e->getMessage();
@@ -327,7 +369,8 @@ class DialogueBD
         }
     }
 
-    public function updateTotal($order_id, $price) {
+    public function updateTotal($order_id, $price)
+    {
         $updateOK = false;
         $id = (int)$order_id; // On converti en int order_id
         try {
@@ -346,7 +389,8 @@ class DialogueBD
         return $updateOK;
     }
 
-    public function updateOrder($order_id, $payment, $id_delivery) {
+    public function updateOrder($order_id, $payment, $id_delivery)
+    {
         $updateOK = false;
         $id = (int)$order_id; // On converti en int order_id
         $idAdd = (int)$id_delivery;
@@ -365,6 +409,26 @@ class DialogueBD
         }
         return $updateOK;
     }
+
+    public function updateStatut($order_id)
+    {
+        $updateOK = false;
+        $id = (int)$order_id; // On converti en int order_id
+        try {
+            // Maj du prix total de la commande
+            $conn = Connexion::getConnexion();
+            $sql = "UPDATE `orders` SET `status` = 10 WHERE id = ?";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($id));
+            // Variable drapeau indiquant le succès de l'ajout
+            $updateOK = true;
+        } catch (PDOException $e) {
+            $msgErreur = $e->getMessage() . '(' . $e->getFile() . ', ligne ' . $e->getLine() . ')';
+            echo $msgErreur;
+        }
+        return $updateOK;
+    }    
 
     ///////////////////////////////////////////////////////////////////////////////
 
@@ -389,7 +453,49 @@ class DialogueBD
         }
     }
 
-    public function AddProduct($order_id, $product_id, $quantity) {
+
+    public function searchProductOrder($order_id, $id_product)
+    {
+        $id = (int)$order_id; // On converti en int order_id
+        try {
+            // Récupération des produits d'une commande 
+            $conn = Connexion::getConnexion();
+            $sql = "SELECT * FROM `orderitems` WHERE order_id = ? AND product_id = ?";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($id, $id_product));
+            $order = $sth->fetchAll(PDO::FETCH_ASSOC);
+            //var_dump($order);
+            return $order;
+        } catch (PDOException $e) {
+            $erreur = $e->getMessage();
+            echo $erreur;
+        }
+    }
+
+    public function updateQuantity($order_id, $id_product, $qte)
+    {
+        $updateOK = false;
+        $id = (int)$order_id; // On converti en int order_id
+        $idP = (int)$id_product;
+        try {
+            // Maj du prix total de la commande
+            $conn = Connexion::getConnexion();
+            $sql = "UPDATE `orderitems` SET quantity = quantity + ? WHERE order_id = ? AND product_id = ?";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($qte, $id, $idP));
+            // Variable drapeau indiquant le succès de l'ajout
+            $updateOK = true;
+        } catch (PDOException $e) {
+            $msgErreur = $e->getMessage() . '(' . $e->getFile() . ', ligne ' . $e->getLine() . ')';
+            echo $msgErreur;
+        }
+        return $updateOK;
+    }
+
+    public function AddProduct($order_id, $product_id, $quantity)
+    {
         $ajoutOK = false;
         $id = (int)$order_id; // On converti en int order_id
         try {
@@ -409,7 +515,8 @@ class DialogueBD
         return $ajoutOK;
     }
 
-    public function removeProduct($order_id, $product_id) {
+    public function removeProduct($order_id, $product_id)
+    {
         $ajoutOK = false;
         $id = (int)$order_id; // On converti en int order_id
         try {
@@ -432,7 +539,8 @@ class DialogueBD
 
     ///////////////// REQUÊTES SQL TABLE delivery_addresses ///////////////////////
 
-    public function addDeliveryAdresse($firstname, $lastname, $add1, $add2, $ville, $postcode, $phone, $email) {
+    public function addDeliveryAdresse($firstname, $lastname, $add1, $add2, $ville, $postcode, $phone, $email)
+    {
         $ajoutOK = false;
         try {
             // Insertion du nouveau customer
@@ -461,7 +569,7 @@ class DialogueBD
             // Exécution de la requête en lui passant le tableau des arguments
             $sth->execute();
             $utilis = $sth->fetchAll(PDO::FETCH_ASSOC);
-            var_dump($utilis);
+            //var_dump($utilis);
             return $utilis;
         } catch (PDOException $e) {
             $erreur = $e->getMessage();
@@ -479,7 +587,7 @@ class DialogueBD
             // Exécution de la requête en lui passant le tableau des arguments
             $sth->execute(array($id));
             $utilis = $sth->fetchAll(PDO::FETCH_ASSOC);
-            var_dump($utilis);
+            //var_dump($utilis);
             return $utilis;
         } catch (PDOException $e) {
             $erreur = $e->getMessage();

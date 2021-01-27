@@ -72,34 +72,47 @@ function accueil()
 function AjoutPanier($idProduct)
 {
     $idUnique = session_id();
-    //var_dump($idUnique);
     // Ajout d'un produit au panier
     try {
         // on crée un objet référant la classe DialogueBD
         $undlg = new DialogueBD();
-        //$categories = $undlg->getCategories();
+
         $price = $undlg->getPrix($idProduct); // On récupère le prix du produit 
+
         // Si il y déja une commande en cours 
         if (isset($_SESSION['SESS_ORDERNUM'])) {
-            $order = $undlg->AddProduct($_SESSION['SESS_ORDERNUM'], $idProduct, $_POST['Quantity']);
+            // On vérifie si le produit ajouté au panier est déjà dans le commande 
+            $product = $undlg->searchProductOrder($_SESSION['SESS_ORDERNUM'], $idProduct);
+
+            if (count($product) == 1) // Alors on met a jour la quantité seulement 
+                $updateQte = $undlg->updateQuantity($_SESSION['SESS_ORDERNUM'], $idProduct, $_POST['Quantity']);
+            else // Sinon on ajoute le produit au panier
+                $order = $undlg->AddProduct($_SESSION['SESS_ORDERNUM'], $idProduct, $_POST['Quantity']);
+
+            // Mise à jour du prix
             $prix = $_POST['Quantity'] * $price[0]['price'];
-            //var_dump($prix);
             $updatePrice = $undlg->updateTotal($_SESSION['SESS_ORDERNUM'], $prix);
-            //var_dump($updatePrice);
         } else { // Si il n'y pas de commande en cours
+
             if (isset($_SESSION['ID'])) // Si l'utilisateur connecté n'a pas de commande en cours 
                 $orderOK = $undlg->AddOrder($_SESSION['ID'], $idUnique);
             else $orderOK = $undlg->AddOrderUnique($idUnique); // Si l'utilisateur n'est pas connecté 
-            var_dump($orderOK);
+
             if ($orderOK) {
+
                 $idOrder = $undlg->getOrderId(); // Récupération de l'id de la commande créée juste avant 
                 $_SESSION['SESS_ORDERNUM'] = $idOrder[0]['MAX(id)'];
-                var_dump($_SESSION['SESS_ORDERNUM']);
+
+                // On ajoute le produit au panier
                 $productOK = $undlg->AddProduct($_SESSION['SESS_ORDERNUM'], $idProduct, $_POST['Quantity']);
+
+                // Mise à jour du prix
                 $prix = $_POST['Quantity'] * $price[0]['price'];
                 $updatePrice = $undlg->updateTotal($_SESSION['SESS_ORDERNUM'], $prix);
             }
         }
+
+        // On se revient sur la page où l'utilisateur été juste avant
         $cat_id = $undlg->getCatId($idProduct);
         categorie($cat_id[0]['cat_id']);
     } catch (Exception $e) {
@@ -113,14 +126,18 @@ function afficherPanier()
         // on crée un objet référant la classe DialogueBD
         $undlg = new DialogueBD();
         $categories = $undlg->getCategories();
+
+        // On regarde si il y une commande en cours
         if (isset($_SESSION['SESS_ORDERNUM'])) {
+
+            // Récupération des articles de la commande
             $products = $undlg->getProductsOrder($_SESSION['SESS_ORDERNUM']);
+            // Récupération du prix total de la commande
             $total = $undlg->getTotal($_SESSION['SESS_ORDERNUM']);
             $connOK = true;
         } else {
             $connOK = false;
         }
-        //var_dump($products);
         require_once './View/panierView.php';
     } catch (Exception $e) {
         $erreur = $e->getMessage();
@@ -132,11 +149,15 @@ function retirerArticle($product_id, $price, $quantity)
     try {
         // on crée un objet référant la classe DialogueBD
         $undlg = new DialogueBD();
-        $categories = $undlg->getCategories();
+
+        // On retire le produit de la commande en cours
         $products = $undlg->removeProduct($_SESSION['SESS_ORDERNUM'], $product_id);
+
+        // Mise à jour du prix
         $prix = $price * $quantity;
         $updatePrice = $undlg->updateTotal($_SESSION['SESS_ORDERNUM'], -$prix);
-        //var_dump($products);
+
+        // On réaffiche le panier
         afficherPanier();
     } catch (Exception $e) {
         $erreur = $e->getMessage();
@@ -149,10 +170,15 @@ function payement()
         // on crée un objet référant la classe DialogueBD
         $undlg = new DialogueBD();
         $categories = $undlg->getCategories();
+
+        // On regarde si l'utilisateur est connecté à son compte
         if (isset($_SESSION['ID']))
-            $coordonnees = $undlg->getAdresse($_SESSION['ID']);
+            $coordonnees = $undlg->getAdresse($_SESSION['ID']); // Si oui on récupère ses coordonnées 
+
+        // On récupère les détails de sa commande (articles et prix total)
         $products = $undlg->getProductsOrder($_SESSION['SESS_ORDERNUM']);
         $total = $undlg->getTotal($_SESSION['SESS_ORDERNUM']);
+
         require_once './View/payementView.php';
     } catch (Exception $e) {
         $erreur = $e->getMessage();
@@ -161,13 +187,15 @@ function payement()
 
 function commandeOK()
 {
-    var_dump($_POST);
+    //var_dump($_POST);
     try {
         // on crée un objet référant la classe DialogueBD
         $undlg = new DialogueBD();
         $categories = $undlg->getCategories();
-        if (isset($_SESSION['ID'])) {
-            if ($_POST['RadioAddSelec'] == 'Other') {
+
+        if (isset($_SESSION['ID'])) { // On regarde si l'utilisateur est connecté à son compte
+
+            if ($_POST['RadioAddSelec'] == 'Other') { // Si l'utilisateur choisi une autre adresse 
                 $ajoutAddOK = $undlg->addDeliveryAdresse(
                     $_POST['prenom'],
                     $_POST['nom'],
@@ -178,13 +206,16 @@ function commandeOK()
                     $_POST['phone'],
                     $_POST['email']
                 );
+
+                // Récupération de l'id de son adresse rentré juste avant 
                 $IDadd = $undlg->getLastDeliveryId();
+                // et on l'ajoute à la commande 
                 $updateOk = $undlg->updateOrder($_SESSION['SESS_ORDERNUM'], $_POST['RadioPlaySelec'], $IDadd[0]['MAX(id)']);
             } else {
                 // On utilise directement l'adresse que l'utilisateur a renseigné lors de son l'inscription d'où le '0'
-                $updateOk = $undlg->updateOrder($_SESSION['SESS_ORDERNUM'], $_POST['RadioPlaySelec'], 0); 
+                $updateOk = $undlg->updateOrder($_SESSION['SESS_ORDERNUM'], $_POST['RadioPlaySelec'], 0);
             }
-        } else {
+        } else { // Si l'utilisateur ne possède pas de compte, il doit rentrer obligatoirement une adresse 
             $ajoutAddOK = $undlg->addDeliveryAdresse(
                 $_POST['prenom'],
                 $_POST['nom'],
@@ -195,8 +226,8 @@ function commandeOK()
                 $_POST['phone'],
                 $_POST['email']
             );
+
             $IDadd = $undlg->getLastDeliveryId();
-            //$adresse = $undlg->getDeliveryAdd($IDadd[0]['MAX(id)']);
             $updateOk = $undlg->updateOrder($_SESSION['SESS_ORDERNUM'], $_POST['RadioPlaySelec'], $IDadd[0]['MAX(id)']);
         }
         require_once './View/recapOrderView.php';
@@ -205,7 +236,7 @@ function commandeOK()
     }
 }
 
-function facturePDF($id)
+function facturePDF($id) // Impression PDF de la facture
 {
     $undlg = new DialogueBD();
     $order = $undlg->getProductsOrder($id);
@@ -213,9 +244,20 @@ function facturePDF($id)
     require_once './View/factureView.php';
 }
 
+function confirmOrder($id) {
+    try {
+        // on crée un objet référant la classe DialogueBD
+        $undlg = new DialogueBD();
+        $updateStatut = $undlg->updateStatut($id);
+        listeCommande();
+    } catch (Exception $e) {
+        $erreur = $e->getMessage();
+    }
+}
+
+
 function inscription()
 {
-    // Récupération des catégories
     try {
         // on crée un objet référant la classe DialogueBD
         $undlg = new DialogueBD();
@@ -232,7 +274,7 @@ function inscription()
         if ($create) {
             $id = $undlg->getLastID();
             $log = $undlg->createLogins($id[0]['MAX(id)'], $_POST['inputForname'], $_POST['inputPassword']);
-            if ($log) {
+            if ($log) { // Après la création du compte on renvoie directement à la page de connexion
                 $_SESSION['REG'] = true;
                 require_once './View/connexionView.php';
             }
@@ -240,6 +282,42 @@ function inscription()
     } catch (Exception $e) {
         $erreur = $e->getMessage();
     }
+}
+
+function listeCommande()
+{
+    try {
+        // on crée un objet référant la classe DialogueBD
+        $undlg = new DialogueBD();
+        // On récupère les commandes payé 
+        $commandes = $undlg->getOrderPaye();
+
+        $adresse = array();
+        $details = array();
+        foreach ($commandes as $c) {
+
+            if ($c['delivery_add_id'] == 0)
+                $adresse[] = $undlg->getAdresse($c['customer_id'])[0];
+            else $adresse[] = $undlg->getDeliveryAdd($c['delivery_add_id'])[0];
+
+            $details[] = $undlg->getProductsOrder($c['id']);
+        }
+        //var_dump($adresse);
+        //var_dump($details[0]);
+
+        require_once './View/listeCommandeView.php';
+    } catch (Exception $e) {
+        $erreur = $e->getMessage();
+    }
+}
+
+function connexionPage() {
+    $_SESSION['authOK'] = true;
+    require_once './View/connexionView.php';
+}
+
+function registerPage() {
+    require_once './View/inscriptionView.php';
 }
 
 function connexion()
@@ -250,22 +328,45 @@ function connexion()
         session_start();
         // on crée un objet référant la classe DialogueBD
         $undlg = new DialogueBD();
-        $user = $undlg->getUtilisateur($_POST['login'], $_POST['mdp']);
-        $categories = $undlg->getCategories();
-        foreach ($user as $u) {
-            $id = $u['customer_id'];
-            $username = $u['username'];
-        }
-        if (isset($id) && isset($username)) {
+
+        $admin = $undlg->getAdmin($_POST['login'], $_POST['mdp']);
+
+        // Si l'admin s'est connecté
+        if (count($admin) == 1) {
+
+            foreach ($admin as $u) {
+                $id = $u['id'];
+                $username = $u['username'];
+            }
+
             $_SESSION['ID'] = $id;
             $_SESSION['NAME'] = $username;
-            $order = $undlg->getOrder($_SESSION['ID']);
-            if (count($order) != 0) // Si l'utilisateur à une commande en cours
-                $_SESSION['SESS_ORDERNUM'] = $order[0]['id'];
-            require_once './View/listeCategView.php';
+
+            listeCommande();
         } else {
-            $_SESSION['authOK'] = false;
-            require_once './View/connexionView.php';
+            // On récupère les infos de l'utilisateur
+            $user = $undlg->getUtilisateur($_POST['login'], $_POST['mdp']);
+            $categories = $undlg->getCategories();
+
+            foreach ($user as $u) {
+                $id = $u['customer_id'];
+                $username = $u['username'];
+            }
+
+            // Si l'utilisteur existe 
+            if (isset($id) && isset($username)) {
+                $_SESSION['ID'] = $id;
+                $_SESSION['NAME'] = $username;
+
+                $order = $undlg->getOrder($_SESSION['ID']);
+                if (count($order) != 0) // Si l'utilisateur à une commande en cours
+                    $_SESSION['SESS_ORDERNUM'] = $order[0]['id'];
+
+                require_once './View/listeCategView.php';
+            } else { // Si la connexion a echoué on reste sur la page de connexion
+                $_SESSION['authOK'] = false;
+                require_once './View/connexionView.php';
+            }
         }
     } catch (Exception $e) {
         $erreur = $e->getMessage();
@@ -274,13 +375,20 @@ function connexion()
 
 function deconnexion()
 {
-    // l'utilisateur s'est déconnecté on détruit la session
-    session_destroy();
-    // Récupération des catégories
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // A FAIRE : Régler ce problème : Il faut cliquer 2 fois sur déconnexion pour se déconnecter.
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     try {
         // on crée un objet référant la classe DialogueBD
         $undlg = new DialogueBD();
+
+        // Récupération des catégories
         $categories = $undlg->getCategories();
+
+        // l'utilisateur s'est déconnecté on détruit la session
+        session_destroy();
+
         require_once './View/listeCategView.php';
     } catch (Exception $e) {
         $erreur = $e->getMessage();

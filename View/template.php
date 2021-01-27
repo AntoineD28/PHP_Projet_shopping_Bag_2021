@@ -11,8 +11,12 @@
 
 <body>
     <?= $content ?>
+    <!--  -->
+    <!-- A FAIRE : Mettre un pied de page. -->
+    <!--  -->
     <script src="./Bootstrap/js/jquery-3.5.1.js"></script>
-    <script src="./Bootstrap/js/bootstrap.min.js"></script>
+    <script src="./Bootstrap/js/bootstrap.bundle.js"></script>
+    <script src="./Bootstrap/js/bootstrap.js"></script>
 </body>
 
 </html>

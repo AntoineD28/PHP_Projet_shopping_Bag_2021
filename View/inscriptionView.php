@@ -1,7 +1,9 @@
 <?php $title = 'Inscription'; ?>
 <?php ob_start(); ?>
 
-<form class="container" action="../index.php?action=inscription" method="post">
+<h1 class="text-center"> Inscription </h1>
+
+<form class="container" action="index.php?action=inscription" method="post">
     <div class="row mb-3">
         <label for="inputForname" class="col-sm-2 col-form-label">Prénom</label>
         <div>
@@ -33,9 +35,9 @@
         </div>
     </div>
     <div class="row mb-3">
-        <label for="inputAdd2" class="col-sm-2 col-form-label">Adresse 3</label>
+        <label for="inputAdd2" class="col-sm-2 col-form-label">Ville</label>
         <div>
-            <input type="text" class="form-control" name="inputAdd3" id="inputAdd3" placeholder="">
+            <input type="text" class="form-control" name="inputAdd3" id="inputAdd3" placeholder="" required>
         </div>
     </div>
     <div class="row mb-3">
@@ -58,7 +60,7 @@
     </div>
     <div class="row">
         <button type="submit" class="btn btn-warning col-lg-1 me-2">Sign in</button>
-        <a class="btn btn-dark text-warning col-lg-1" href="./connexionView.php"> Retour </a>
+        <a class="btn btn-dark text-warning col-lg-1" href="index.php?action=connexionPage"> Retour </a>
     </div>
 
 </form>
