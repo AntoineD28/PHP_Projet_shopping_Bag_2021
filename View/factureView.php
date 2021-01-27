@@ -1,6 +1,6 @@
 <?php
 define('FPDF_FONTPATH','./FPDF/font/');
-require('fpdf.php');
+require('./FPDF/fpdf.php');
 class PDF extends FPDF
 {
 // Page header

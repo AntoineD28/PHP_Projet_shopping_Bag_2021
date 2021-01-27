@@ -35,7 +35,11 @@ ob_start();
                     </div>';
             } else echo '<a class="btn btn-warning me-2" href="index.php?action=connexionPage" role="button"><i class="fas fa-user"></i> Connexion</a>';
             ?>
-            <a class="btn btn-dark text-warning" href="index.php?action=afficherPanier" role="button"><i class="fas fa-shopping-cart"></i> Mon Panier</a>
+            <a class="btn btn-dark text-warning" href="index.php?action=afficherPanier" role="button"><i class="fas fa-shopping-cart"></i> Mon Panier (<?php
+                                                                                                                                                        if (isset($_SESSION['NB_PANIER']))
+                                                                                                                                                            echo $_SESSION['NB_PANIER'];
+                                                                                                                                                        else echo '0'
+                                                                                                                                                        ?>)</a>
         </div>
     </div>
 </nav>
@@ -45,11 +49,22 @@ ob_start();
 
 <div class="container">
     <p class="text-center"> Votre facture est disponible <a href="index.php?action=facturePDF&id=<?php echo $_SESSION['SESS_ORDERNUM']; ?>" target="_blank">ici</a> </p>
+
+    <?php 
+        echo '<p class="text-center"> Vous avez choisi le moyen de payement : '. $_SESSION['MOY_PAY'] .'</p>';
+        if ($_SESSION['MOY_PAY'] == 'cheque') {
+            echo '
+                <p class="text-center"> Votre chèque est à envoyer à l\'adresse suivante :</p>
+                <p class="text-center"> 15 Boulevard André Latarjet, 69100 Villeurbanne, FRANCE</p>
+            ';
+        }
+    ?>
 </div>
 
 
 <?php
 $_SESSION['SESS_ORDERNUM'] = NULL;
+$_SESSION['NB_PANIER'] = 0;
 $content = ob_get_clean();
 require_once 'template.php';
 ?>

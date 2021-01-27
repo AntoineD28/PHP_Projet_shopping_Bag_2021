@@ -1,5 +1,6 @@
 <?php $title = 'TeaTea'; ?>
-<?php ob_start(); ?>
+<?php ob_start(); 
+?>
 
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #414141;">
     <div class="container-fluid">
@@ -33,7 +34,11 @@
                     </div>';
             } else echo '<a class="btn btn-warning me-2" href="index.php?action=connexionPage" role="button"><i class="fas fa-user"></i> Connexion</a>';
             ?>
-            <a class="btn btn-dark text-warning" href="index.php?action=afficherPanier" role="button"><i class="fas fa-shopping-cart"></i> Mon Panier</a>
+            <a class="btn btn-dark text-warning" href="index.php?action=afficherPanier" role="button"><i class="fas fa-shopping-cart"></i> Mon Panier (<?php
+                                                                                                                                                        if (isset($_SESSION['NB_PANIER']))
+                                                                                                                                                            echo $_SESSION['NB_PANIER'];
+                                                                                                                                                        else echo '0'
+                                                                                                                                                        ?>)</a>
         </div>
     </div>
 </nav>

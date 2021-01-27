@@ -29,6 +29,9 @@
         ?>
         <p class="text-center mt-4"> Si vous n'avez pas de compte client vous pouuvez en créer un ici :</p>
         <a class="btn btn-dark text-warning col-lg-4" href="index.php?action=registerPage">Inscription</a>
+        <div class="row justify-content-md-center">
+            <a class="btn btn-warning col-lg-4 mt-2" href="index.php">Retour acceuil</a>
+        </div>
     </div>
 </div>
 

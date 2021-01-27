@@ -43,13 +43,13 @@
     <div class="row mb-3">
         <label for="inputPosteCode" class="col-sm-2 col-form-label">Code Postal</label>
         <div>
-            <input type="text" class="form-control" name="inputPostCode" id="inputPostCode" placeholder="69000" required>
+            <input type="text" class="form-control" name="inputPostCode" id="inputPostCode" placeholder="69000" pattern="[0-9]{5,5}" required>
         </div>
     </div>
     <div class="row mb-3">
         <label for="inputPhone" class="col-sm-2 col-form-label">Téléphone</label>
         <div>
-            <input type="text" class="form-control" name="inputPhone" id="inputPhone" placeholder="" required>
+            <input type="tel" class="form-control" name="inputPhone" id="inputPhone" pattern="[0-9]{2}[0-9]{2}[0-9]{2}[0-9]{2}[0-9]{2}" required>
         </div>
     </div>
     <div class="row mb-3">
