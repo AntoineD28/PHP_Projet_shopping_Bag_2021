@@ -535,6 +535,25 @@ class DialogueBD
         return $ajoutOK;
     }
 
+    public function getNbProduct($order_id)
+    {
+        $id = (int)$order_id; // On converti en int order_id
+        try {
+            // Récupération des produits d'une commande 
+            $conn = Connexion::getConnexion();
+            $sql = "SELECT SUM(quantity) FROM `orderitems` WHERE order_id = ?";
+            $sth = $conn->prepare($sql);
+            // Exécution de la requête en lui passant le tableau des arguments
+            $sth->execute(array($id));
+            $nb = $sth->fetchAll(PDO::FETCH_ASSOC);
+            //var_dump($order);
+            return $nb;
+        } catch (PDOException $e) {
+            $erreur = $e->getMessage();
+            echo $erreur;
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////
 
     ///////////////// REQUÊTES SQL TABLE delivery_addresses ///////////////////////
