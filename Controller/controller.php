@@ -71,6 +71,9 @@ function accueil()
 
 function AjoutPanier($idProduct)
 {
+    if (!isset($_SESSION['NB_PANIER']))
+        $_SESSION['NB_PANIER'] = 0;
+
     $idUnique = session_id();
     // Ajout d'un produit au panier
     try {
@@ -111,6 +114,9 @@ function AjoutPanier($idProduct)
                 $updatePrice = $undlg->updateTotal($_SESSION['SESS_ORDERNUM'], $prix);
             }
         }
+
+        // On met à jour le nombre de d'éléments dans le panier
+        $_SESSION['NB_PANIER'] += $_POST['Quantity'];
 
         // On se revient sur la page où l'utilisateur été juste avant
         $cat_id = $undlg->getCatId($idProduct);
@@ -156,6 +162,9 @@ function retirerArticle($product_id, $price, $quantity)
         // Mise à jour du prix
         $prix = $price * $quantity;
         $updatePrice = $undlg->updateTotal($_SESSION['SESS_ORDERNUM'], -$prix);
+
+        // On met à jour le nombre de d'éléments dans le panier
+        $_SESSION['NB_PANIER'] -= $quantity;
 
         // On réaffiche le panier
         afficherPanier();
@@ -230,6 +239,8 @@ function commandeOK()
             $IDadd = $undlg->getLastDeliveryId();
             $updateOk = $undlg->updateOrder($_SESSION['SESS_ORDERNUM'], $_POST['RadioPlaySelec'], $IDadd[0]['MAX(id)']);
         }
+
+        $_SESSION['MOY_PAY'] = $_POST['RadioPlaySelec'];
         require_once './View/recapOrderView.php';
     } catch (Exception $e) {
         $erreur = $e->getMessage();
@@ -244,7 +255,8 @@ function facturePDF($id) // Impression PDF de la facture
     require_once './View/factureView.php';
 }
 
-function confirmOrder($id) {
+function confirmOrder($id)
+{
     try {
         // on crée un objet référant la classe DialogueBD
         $undlg = new DialogueBD();
@@ -311,12 +323,14 @@ function listeCommande()
     }
 }
 
-function connexionPage() {
-    $_SESSION['authOK'] = true;
+function connexionPage()
+{
+    $_SESSION['authOK'] = true; // true de base
     require_once './View/connexionView.php';
 }
 
-function registerPage() {
+function registerPage()
+{
     require_once './View/inscriptionView.php';
 }
 
@@ -359,8 +373,16 @@ function connexion()
                 $_SESSION['NAME'] = $username;
 
                 $order = $undlg->getOrder($_SESSION['ID']);
-                if (count($order) != 0) // Si l'utilisateur à une commande en cours
+
+                if (count($order) != 0) {// Si l'utilisateur à une commande en cours
+                
+                    // On récupère l'id de la commande
                     $_SESSION['SESS_ORDERNUM'] = $order[0]['id'];
+
+                    $nbProd = $undlg->getNbProduct($_SESSION['SESS_ORDERNUM']);
+                    // On récupère les nombre d'éléments de la commande en cours
+                    $_SESSION['NB_PANIER'] = $nbProd[0]['SUM(quantity)'];
+                }
 
                 require_once './View/listeCategView.php';
             } else { // Si la connexion a echoué on reste sur la page de connexion
